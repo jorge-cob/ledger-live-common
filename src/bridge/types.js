@@ -9,7 +9,12 @@
 
 import type { Observable } from "rxjs";
 import type { BigNumber } from "bignumber.js";
-import type { Account, Operation, CryptoCurrency } from "../types";
+import type {
+  Account,
+  Operation,
+  CryptoCurrency,
+  TransactionStatus
+} from "../types";
 
 // unique identifier of a device. it will depends on the underlying implementation.
 export type DeviceId = string;
@@ -45,6 +50,8 @@ export interface AccountBridge<Transaction> {
   // There are a bunch of edit and get functions to edit and extract information out ot this black box.
   // it needs to be a serializable JS object
   createTransaction(account: Account): Transaction;
+
+  // FIXME: the *TransactionNetworkInfo should be merged into prepareTransaction !
 
   // fetch various information asynchronously: typically fees.
   // ideally should be loaded before checking valid tranction / calculating total to spend / max amount / ..
@@ -113,22 +120,26 @@ export interface AccountBridge<Transaction> {
   // - if promise is successful with null, all is fine
   // - if promise is successful with an error object, it's a warning to display
   // - if promise is unsuccessful, it's an error
+  // FIXME replace by getTransactionStatus
   checkValidRecipient(account: Account, recipient: string): Promise<?Error>;
 
   // Validates that the transaction is ready to be performed with all information provided and correct.
   // - if promise is successful with null, it means transaction can be performed
   // - if promise is successful with an error object, it's just a warning to display
   // - otherwise it throws an error with the reason of the invalid case.
+  // FIXME replace by getTransactionStatus
   checkValidTransaction(
     account: Account,
     transaction: Transaction
   ): Promise<?Error>;
 
   // get the total amount that will be spend for a given transaction
+  // FIXME replace by getTransactionStatus
   getTotalSpent(account: Account, transaction: Transaction): Promise<BigNumber>;
 
   // max amount an account can be wiped. this is to be connected to the "MAX" feature
   // this can depends on fields of transaction itself because it depends on contextual information like if you send to a segwit/non-segwit address, etc..
+  // FIXME replace by getTransactionStatus
   getMaxAmount(account: Account, transaction: Transaction): Promise<BigNumber>;
 
   // finalizes the transaction by
@@ -144,6 +155,7 @@ export interface AccountBridge<Transaction> {
   // some coins will have a way to configure the API it hits.
   // it is stored in account.endpointConfig
   // this allow to customize it from UI. there is a default endpoint and a way to validate a new one.
+  // FIXME drop?
   getDefaultEndpointConfig?: () => string;
   validateEndpointConfig?: (endpointConfig: string) => Promise<void>;
 
@@ -154,4 +166,10 @@ export interface AccountBridge<Transaction> {
     account: Account,
     transaction: Transaction
   ): Promise<Transaction>;
+
+  // NEW! when fully switching to this, we'll drop other methods!
+  getTransactionStatus(
+    account: Account,
+    transaction: Transaction
+  ): Promise<TransactionStatus>;
 }

@@ -36,7 +36,7 @@ import type {
   AssetsDistribution
 } from "./portfolio";
 
-import type { Transaction } from "./transaction";
+import type { Transaction, TransactionStatus } from "./transaction";
 
 export type {
   DerivationMode,
@@ -63,6 +63,7 @@ export type {
   PortfolioRange,
   Portfolio,
   Transaction,
+  TransactionStatus,
   AssetsDistribution
 };
 
