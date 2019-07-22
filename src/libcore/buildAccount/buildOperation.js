@@ -6,7 +6,7 @@ import { inferSubOperations } from "../../account";
 import type { CoreOperation } from "../types";
 import perFamily from "../../generated/libcore-buildOperation";
 
-const OperationTypeMap = {
+export const OperationTypeMap = {
   "0": "OUT",
   "1": "IN"
 };
@@ -47,24 +47,28 @@ export async function buildOperation(arg: {
 
   const date = new Date(await coreOperation.getDate());
 
-  const rest = await buildOp(arg);
-  const id = `${accountId}-${rest.hash}-${type}`;
-
-  const op: $Exact<Operation> = {
-    id,
+  const partialOp = {
     type,
     value,
     fee,
     senders,
     recipients,
     blockHeight,
-    blockHash: null, // FIXME: why? (unused)
+    blockHash: null,
     accountId,
     date,
-    extra: {},
+    extra: {}
+  };
+
+  const rest = await buildOp(arg, partialOp);
+  const id = `${accountId}-${rest.hash}-${type}`;
+
+  const op: $Exact<Operation> = {
+    id,
     subOperations: contextualTokenAccounts
       ? inferSubOperations(rest.hash, contextualTokenAccounts)
       : undefined,
+    ...partialOp,
     ...rest
   };
 

@@ -53,7 +53,11 @@ export type Operation = {
 
   // in context of accounts that can have tokens, an operation can contains itself operations
   // these are not in raw at all because they are meant to be rebuilt from the references
-  subOperations?: Operation[]
+  subOperations?: Operation[],
+
+  // in context of accounts that have internal transactions that belong to a parent transaction
+  // we have internal operations. Those are not included in the top level operations but can be presented to UI at that same level
+  internalOperations?: Operation[]
 };
 
 export type OperationRaw = {
@@ -72,5 +76,9 @@ export type OperationRaw = {
   // --------------------------------------------- specific operation raw fields
   date: string,
   extra: Object, // would be a serializable version of the extra
-  subOperations?: OperationRaw[]
+  subOperations?: OperationRaw[],
+
+  // in context of accounts that have internal transactions that belong to a parent transaction
+  // we have internal operations. Those are not included in the top level operations but can be presented to UI at that same level
+  internalOperations?: OperationRaw[]
 };

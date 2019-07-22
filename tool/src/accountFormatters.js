@@ -27,6 +27,7 @@ const formatOp = unitByAccountId => {
     const extra = level > 0 ? "" : ` ${op.hash}     ${op.date.toGMTString()}`;
     const head = `${(spaces + amount).padEnd(26)} ${extra}`;
     const sub = (op.subOperations || [])
+      .concat(op.internalOperations || [])
       .map(subop => format(subop, level + 1))
       .join("");
     return `\n${head}${sub}`;
